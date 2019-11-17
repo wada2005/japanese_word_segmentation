@@ -40,7 +40,7 @@ def main() :
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], shortopts, longopts)
-    except getopt.GetoptError, err:
+    except getopt.GetoptError as err:
         usage()
     
     for o, a in opts:
