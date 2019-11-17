@@ -123,6 +123,8 @@ def main() :
         process_ngram(indata, outdata, args.num)
     elif args.method == "mecab":
         process_mecab(indata, outdata, args.num)
+    else:
+        usage()
 
 if __name__ == "__main__":
     main ()
