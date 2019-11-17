@@ -1,14 +1,17 @@
 import re
 import sys
-import getopt
 import MeCab
+import argparse
 from collections import defaultdict
 
 tagger = MeCab.Tagger('')
 pat = re.compile(r'[0-9０-９]')
 
 def usage():
-    print('usage: % word_segmentation.py indata outdata')
+    print('usage: % word_segmentation.py --method=hoge --num=N indata outdata')
+    print('options')
+    print('  --method ngram or mecab ')
+    print('  --num    ngram n, mecab 0:all 1:not all')
     sys.exit(0)
 
 def eprint(text):
@@ -98,40 +101,28 @@ def process_mecab(infile, outfile, n):
                 wordcount = parse_mecab(line.rstrip('\n'), n)
                 fo.write(wordcount)
 
+
+def get_option():
+    parser = argparse.ArgumentParser(description='segmentation')
+    parser.add_argument('arg1')    # indata
+    parser.add_argument('arg2')    # outdata
+    parser.add_argument('-m', '--method',type=str, default="mecab", help='ngram or mecab') 
+    parser.add_argument('-n', '--num', type=int, default=0, help='ngram N, mecab 0:all, 1:not')
+    args = parser.parse_args()
+    return args
+
 def main() :
-    shortopts = "m:n"
-    longopts = ['method=', 'num=']
-    M = "ngram"
-    N = 2
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], shortopts, longopts)
-    except getopt.GetoptError:
-        usage()
-    
-    for o, a in opts:
-        if o in ('-m', '--method'):
-            M = a
-        elif o in ('-n', '--num'):
-            N = int(a)
-        elif o in ('-h', '--help'):
-            usage()
-        else:
-            assert False, "unknown option"
-
-    if len(args) == 2:
-        indata = args[0]
-        outdata = args[1]
-    else:
-        usage ()
-
-    eprint('Method = %s, N = %d' % (M, N))
+    args = get_option()
+    eprint('Method = %s, N = %d' % (args.method, args.num))
     eprint('processing data ...')
 
-    if M == "ngram":
-        process_ngram(indata, outdata, N)
-    elif M == "mecab":
-        process_mecab(indata, outdata, N)
+    indata = args.arg1
+    outdata = args.arg2
+
+    if args.method == "ngram":
+        process_ngram(indata, outdata, args.num)
+    elif args.method == "mecab":
+        process_mecab(indata, outdata, args.num)
 
 if __name__ == "__main__":
     main ()
